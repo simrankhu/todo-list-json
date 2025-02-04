@@ -29,6 +29,14 @@ if(file_exists('data.json')){
         exit();
     }
  }
+ 
+ if (isset($_POST['toggleTheme'])) {
+    $_SESSION['theme'] = ($_SESSION['theme'] ?? 'dark') === 'light' ? 'light' : 'dark';
+    exit(); // Stop execution after updating the session
+}
+
+// Set the theme (default: light)
+$theme = $_SESSION['theme'] ?? 'dark';
 
 ?>
 <!doctype html>
@@ -122,11 +130,99 @@ if(file_exists('data.json')){
         }
     }
 
-    body {
-
-        background: var(--pico-background-color);
+    body.light {
+        background: rgba(255, 255, 255, 0.92);
 
     }
+
+    body.light nav i {
+
+        color: #181c25;
+    }
+
+    body.light nav h1 {
+        margin-bottom: 10px;
+        font-weight: 800;
+        font-size: 2rem;
+        line-height: 1.25;
+        color: black;
+    }
+
+    body.dark nav h1 {
+
+        color: var(--pico-h1-color);
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-weight: 800;
+        font-size: 2rem;
+        line-height: 1.25;
+
+        font-family: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif;
+    }
+
+
+    /* Dark Theme */
+    body.dark {
+        background: var(--pico-background-color);
+        color: #ffffff;
+    }
+
+    body.dark article {
+        margin-bottom: 10px;
+        padding: 20px 0px;
+        border-radius: 10px;
+        background: #181c25;
+        box-shadow: var(--pico-card-box-shadow);
+        color: var(--pico-color);
+    }
+
+    body.light article {
+        margin-bottom: 10px;
+        padding: 20px 0px;
+        border-radius: 10px;
+        background: whitesmoke;
+        box-shadow: var(--pico-card-box-shadow);
+        color: black;
+    }
+
+    body.light article>header {
+        margin-top: calc(var(--pico-block-spacing-vertical)* -1);
+        margin-bottom: var(--pico-block-spacing-vertical);
+        border-bottom: #181c25;
+        border-top-right-radius: var(--pico-border-radius);
+        border-top-left-radius: var(--pico-border-radius);
+        margin-right: calc(var(--pico-block-spacing-horizontal)* -1);
+        margin-left: calc(var(--pico-block-spacing-horizontal)* -1);
+        padding: 20px 20px;
+        background-color: white;
+    }
+
+    body.dark article>header {
+        margin-top: calc(var(--pico-block-spacing-vertical)* -1);
+        margin-bottom: var(--pico-block-spacing-vertical);
+        border-bottom: #181c25;
+        border-top-right-radius: var(--pico-border-radius);
+        border-top-left-radius: var(--pico-border-radius);
+        margin-right: calc(var(--pico-block-spacing-horizontal)* -1);
+        margin-left: calc(var(--pico-block-spacing-horizontal)* -1);
+        padding: 20px 20px;
+        background-color: #1a1f28;
+
+    }
+
+
+    label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        gap: 10px;
+        font-size: 20px;
+    }
+
+    input[type="checkbox"] {
+        display: none;
+    }
+
 
     .todolist {
         padding-left: 0;
@@ -170,41 +266,13 @@ if(file_exists('data.json')){
         padding: 20px 20px;
     }
 
-    nav h1 {
-        color: var(--pico-h1-color);
-        margin-top: 0;
-        margin-bottom: 10px;
-        font-weight: 800;
-        font-size: 2rem;
-        line-height: 1.25;
 
-        font-family: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif;
-    }
-
-    nav i {
+    body.dark nav i {
         color: var(--pico-color);
     }
 
-    article {
-        margin-bottom: 10px;
-        padding: 20px 0px;
-        border-radius: 10px;
-        background: #181c25;
-        box-shadow: var(--pico-card-box-shadow);
-        color: var(--pico-color);
-    }
 
-    article>header {
-        margin-top: calc(var(--pico-block-spacing-vertical)* -1);
-        margin-bottom: var(--pico-block-spacing-vertical);
-        border-bottom: #181c25;
-        border-top-right-radius: var(--pico-border-radius);
-        border-top-left-radius: var(--pico-border-radius);
-        margin-right: calc(var(--pico-block-spacing-horizontal)* -1);
-        margin-left: calc(var(--pico-block-spacing-horizontal)* -1);
-        padding: 20px 20px;
-        background-color: #1a1f28;
-    }
+
 
     [role=group],
     [role=search] {
@@ -253,14 +321,14 @@ if(file_exists('data.json')){
     </style>
 </head>
 
-<body>
+<body class="<?= $theme ?>">
     <header class="container">
         <nav>
             <h1>To Do List</h1>
             <label>
-                <i class="fa-solid fa-sun"></i>
-                <i class="fa-solid fa-moon"></i>
-                <input type="checkbox" id="modeToggle" role="switch">
+                <i class="fa-solid fa-sun" id="sunIcon"></i>
+                <input type="checkbox" id="modeToggle" role="switch" <?= $theme === 'dark' ? 'checked' : '' ?>>
+                <i class="fa-solid fa-moon" id="moonIcon"></i>
             </label>
         </nav>
     </header>
@@ -303,7 +371,15 @@ if(file_exists('data.json')){
     </main>
 
 
-
+    <script>
+    document.getElementById("modeToggle").addEventListener("change", () => {
+        fetch("", {
+                method: "POST",
+                body: "toggleTheme=true"
+            })
+            .then(() => document.body.classList.toggle("dark"));
+    });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
     </script>
